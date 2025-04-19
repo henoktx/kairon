@@ -8,4 +8,8 @@ dependencies = [
     "django>=5.2",
     "djangorestframework-simplejwt>=5.5.0",
     "djangorestframework>=3.16.0",
+    "mailersend>=0.5.8",
+    "psycopg2-binary>=2.9.10",
+    "dotenv>=0.9.9",
+    "black>=25.1.0",
 ]
