@@ -28,7 +28,7 @@ class TaskSerializer(serializers.ModelSerializer):
             "retry_attempts",
             "retry_delay",
             "email_config",
-            "report_config"
+            "report_config",
         ]
 
     def validate(self, data):
@@ -51,13 +51,7 @@ class TaskSerializer(serializers.ModelSerializer):
 class ScheduleSpecSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = [
-            "minute",
-            "hour",
-            "day_of_month",
-            "month",
-            "day_of_week"
-        ]
+        fields = ["minute", "hour", "day_of_month", "month", "day_of_week"]
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
@@ -74,22 +68,22 @@ class WorkflowSerializer(serializers.ModelSerializer):
             "created_at",
             "delay_seconds",
             "tasks",
-            "spec"
+            "spec",
         ]
         read_only_fields = ["created_by", "created_at", "id"]
 
     def create(self, validated_data):
         tasks_data = validated_data.pop("tasks")
         schedule_data = validated_data.pop("schedules", None)
-        
+
         workflow = Workflow.objects.create(**validated_data)
 
         for task_data in tasks_data:
             email_config = task_data.pop("email_config", None)
             report_config = task_data.pop("report_config", None)
-            
+
             task = Task.objects.create(workflow=workflow, **task_data)
-            
+
             if email_config:
                 EmailTask.objects.create(task=task, **email_config)
             elif report_config:
@@ -99,7 +93,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
             Schedule.objects.create(
                 workflow=workflow,
                 created_by=validated_data["created_by"],
-                **schedule_data
+                **schedule_data,
             )
 
         return workflow

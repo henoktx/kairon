@@ -10,9 +10,11 @@ class CreateUserView(generics.CreateAPIView):
     serializer_class = UserSerializer
 
 
-class UpdateDestroyRetrieveUserViewSet(mixins.UpdateModelMixin, 
-                              mixins.DestroyModelMixin,
-                              mixins.RetrieveModelMixin, 
-                              viewsets.GenericViewSet):
+class UpdateDestroyRetrieveUserViewSet(
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
     queryset = User.objects.all()
     serializer_class = UserSerializer
