@@ -15,8 +15,8 @@ class ReportTaskSerializer(serializers.ModelSerializer):
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    email_config = EmailTaskConfigSerializer(required=False)
-    report_config = ReportTaskConfigSerializer(required=False)
+    email_config = EmailTaskSerializer(required=False)
+    report_config = ReportTaskSerializer(required=False)
 
     class Meta:
         model = Task
