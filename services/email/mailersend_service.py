@@ -10,7 +10,13 @@ class MailerSendService(EmailService):
         self.api_key = settings.MAILERSEND_API_KEY
         self.default_from_email = settings.DEFAULT_FROM_EMAIL
         self.default_from_name = settings.DEFAULT_FROM_NAME
-        self.mailer = emails.NewEmail(self.api_key)
+        self._mailer = None
+
+    @property
+    def mailer(self):
+        if self._mailer is None:
+            self._mailer = emails.NewEmail(self.api_key)
+        return self._mailer
 
     def _prepare_recipients(self, emails_list: List[str]) -> List[Dict[str, str]]:
         return [{"email": email} for email in emails_list]
@@ -20,8 +26,8 @@ class MailerSendService(EmailService):
         to_email: str,
         subject: str,
         content: str,
-        from_name: str,
-        from_email: str,
+        from_name: Optional[str] = None,
+        from_email: Optional[str] = None,
         cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         template_id: Optional[str] = None,
@@ -34,7 +40,10 @@ class MailerSendService(EmailService):
                 "name": self.default_from_name,
             }
 
-            reply_to = {"email": from_email, "name": from_name}
+            reply_to = {
+                "email": from_email or self.default_from_email,
+                "name": from_name or self.default_from_name,
+            }
 
             recipients = self._prepare_recipients([to_email])
             cc_list = self._prepare_recipients(cc) if cc else None
@@ -56,7 +65,7 @@ class MailerSendService(EmailService):
                 self.mailer.set_plaintext_content(content, body)
 
             response = self.mailer.send(body)
-            return response.status_code == 202
+            return response == 202
 
         except Exception as e:
             raise EmailServiceError(f"Erro ao enviar email: {str(e)}")
@@ -66,21 +75,28 @@ class MailerSendService(EmailService):
         to_emails: List[str],
         subject: str,
         content: str,
-        from_email: str,
+        from_name: Optional[str] = None,
+        from_email: Optional[str] = None,
         template_id: Optional[str] = None,
     ) -> bool:
         try:
             body = {}
 
             mail_from = {
-                "email": from_email or self.default_from_email,
+                "email": self.default_from_email,
                 "name": self.default_from_name,
+            }
+
+            reply_to = {
+                "email": from_email or self.default_from_email,
+                "name": from_name or self.default_from_name,
             }
 
             recipients = self._prepare_recipients(to_emails)
 
             self.mailer.set_mail_from(mail_from, body)
-            self.mailer.set_recipients(recipients, body)
+            self.mailer.set_mail_to(recipients, body)
+            self.mailer.set_reply_to(reply_to, body)
 
             if template_id:
                 self.mailer.set_template(template_id, body)
@@ -89,7 +105,7 @@ class MailerSendService(EmailService):
                 self.mailer.set_plaintext_content(content, body)
 
             response = self.mailer.send(body)
-            return response.status_code == 202
+            return response == 202
 
         except Exception as e:
             raise EmailServiceError(f"Erro ao enviar emails em massa: {str(e)}")
