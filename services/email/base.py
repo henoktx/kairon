@@ -9,7 +9,8 @@ class EmailService(ABC):
         to_email: str,
         subject: str,
         content: str,
-        from_email: str,
+        from_name: Optional[str] = None,
+        from_email: Optional[str] = None,
         cc: Optional[List[str]] = None,
         bcc: Optional[List[str]] = None,
         template_id: Optional[str] = None,
@@ -22,7 +23,8 @@ class EmailService(ABC):
         to_emails: List[str],
         subject: str,
         content: str,
-        from_email: str,
+        from_name: Optional[str] = None,
+        from_email: Optional[str] = None,
         template_id: Optional[str] = None,
     ) -> bool:
         pass
