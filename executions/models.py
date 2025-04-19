@@ -1,7 +1,7 @@
 from django.db import models
 
-from ..workflows.models import Workflow, Task
-from ..users.models import User
+from workflows.models import Workflow, Task
+from users.models import User
 
 
 class Execution(models.Model):
@@ -27,6 +27,11 @@ class Execution(models.Model):
 
     def __str__(self):
         return f"Execution {self.id} - {self.workflow.name} ({self.status})"
+
+    def execution_time(self):
+        if self.completed_at and self.started_at:
+            return (self.completed_at - self.started_at).total_seconds()
+        return None
 
 
 class TaskExecution(models.Model):
@@ -54,3 +59,8 @@ class TaskExecution(models.Model):
 
     def __str__(self):
         return f"Task {self.task.name} ({self.status})"
+
+    def execution_time(self):
+        if self.completed_at and self.started_at:
+            return (self.completed_at - self.started_at).total_seconds()
+        return None
