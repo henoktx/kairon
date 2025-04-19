@@ -15,67 +15,176 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Task',
+            name="Task",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('description', models.TextField(blank=True)),
-                ('order', models.PositiveIntegerField()),
-                ('task_type', models.CharField(choices=[('email', 'Email Sending'), ('report', 'Report Generation')], max_length=20)),
-                ('retry_attempts', models.PositiveIntegerField(default=5)),
-                ('retry_delay', models.PositiveIntegerField(default=15)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("description", models.TextField(blank=True)),
+                ("order", models.PositiveIntegerField()),
+                (
+                    "task_type",
+                    models.CharField(
+                        choices=[
+                            ("email", "Email Sending"),
+                            ("report", "Report Generation"),
+                        ],
+                        max_length=20,
+                    ),
+                ),
+                ("retry_attempts", models.PositiveIntegerField(default=5)),
+                ("retry_delay", models.PositiveIntegerField(default=15)),
             ],
         ),
         migrations.CreateModel(
-            name='ReportTask',
+            name="ReportTask",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('filter_type', models.CharField(choices=[('last_hour', 'Last Hour'), ('last_day', 'Last Day'), ('last_week', 'Last Week'), ('last_month', 'Last Month')], default='last_hour', max_length=20)),
-                ('task', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='report_config', to='workflows.task')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "filter_type",
+                    models.CharField(
+                        choices=[
+                            ("last_hour", "Last Hour"),
+                            ("last_day", "Last Day"),
+                            ("last_week", "Last Week"),
+                            ("last_month", "Last Month"),
+                        ],
+                        default="last_hour",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "task",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="report_config",
+                        to="workflows.task",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='EmailTask',
+            name="EmailTask",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('recipients', models.TextField(help_text='List of email recipients, separated by commas')),
-                ('subject', models.CharField(max_length=200)),
-                ('content', models.TextField()),
-                ('cc', models.TextField(blank=True, help_text='List of CC email addresses, separated by commas')),
-                ('task', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='email_config', to='workflows.task')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "recipients",
+                    models.TextField(
+                        help_text="List of email recipients, separated by commas"
+                    ),
+                ),
+                ("subject", models.CharField(max_length=200)),
+                ("content", models.TextField()),
+                (
+                    "cc",
+                    models.TextField(
+                        blank=True,
+                        help_text="List of CC email addresses, separated by commas",
+                    ),
+                ),
+                (
+                    "task",
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="email_config",
+                        to="workflows.task",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Workflow',
+            name="Workflow",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('description', models.TextField(blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('is_active', models.BooleanField(default=True)),
-                ('delay_seconds', models.IntegerField(default=0)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("description", models.TextField(blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("is_active", models.BooleanField(default=True)),
+                ("delay_seconds", models.IntegerField(default=0)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddField(
-            model_name='task',
-            name='workflow',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='tasks', to='workflows.workflow'),
+            model_name="task",
+            name="workflow",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="tasks",
+                to="workflows.workflow",
+            ),
         ),
         migrations.CreateModel(
-            name='Schedule',
+            name="Schedule",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('is_active', models.BooleanField(default=True)),
-                ('minute', models.IntegerField(blank=True, null=True)),
-                ('hour', models.IntegerField(blank=True, null=True)),
-                ('day_of_month', models.IntegerField(blank=True, null=True)),
-                ('month', models.IntegerField(blank=True, null=True)),
-                ('day_of_week', models.IntegerField(blank=True, null=True)),
-                ('temporal_schedule_id', models.CharField(blank=True, max_length=100)),
-                ('created_by', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
-                ('workflow', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='schedules', to='workflows.workflow')),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("is_active", models.BooleanField(default=True)),
+                ("minute", models.IntegerField(blank=True, null=True)),
+                ("hour", models.IntegerField(blank=True, null=True)),
+                ("day_of_month", models.IntegerField(blank=True, null=True)),
+                ("month", models.IntegerField(blank=True, null=True)),
+                ("day_of_week", models.IntegerField(blank=True, null=True)),
+                ("temporal_schedule_id", models.CharField(blank=True, max_length=100)),
+                (
+                    "created_by",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "workflow",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="schedules",
+                        to="workflows.workflow",
+                    ),
+                ),
             ],
         ),
     ]

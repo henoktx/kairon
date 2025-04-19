@@ -6,7 +6,7 @@ from workflows.serializers import WorkflowSerializer, TaskSerializer
 class TaskExecutionSerializer(serializers.ModelSerializer):
     task = TaskSerializer(read_only=True)
     execution_time = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = TaskExecution
         fields = [
@@ -19,7 +19,7 @@ class TaskExecutionSerializer(serializers.ModelSerializer):
             "next_retry_at",
             "temporal_activity_id",
             "error_message",
-            "execution_time"
+            "execution_time",
         ]
         read_only_fields = fields
 
@@ -31,7 +31,7 @@ class ExecutionSerializer(serializers.ModelSerializer):
     workflow = WorkflowSerializer(read_only=True)
     task_executions = TaskExecutionSerializer(many=True, read_only=True)
     execution_time = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = Execution
         fields = [
@@ -43,7 +43,7 @@ class ExecutionSerializer(serializers.ModelSerializer):
             "status",
             "error_message",
             "task_executions",
-            "execution_time"
+            "execution_time",
         ]
         read_only_fields = fields
 
@@ -54,9 +54,11 @@ class ExecutionSerializer(serializers.ModelSerializer):
 class TaskExecutionDetailSerializer(serializers.ModelSerializer):
     task_name = serializers.CharField(source="task.name", read_only=True)
     task_type = serializers.CharField(source="task.task_type", read_only=True)
-    execution_workflow = serializers.CharField(source="execution.workflow.name", read_only=True)
+    execution_workflow = serializers.CharField(
+        source="execution.workflow.name", read_only=True
+    )
     execution_time = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = TaskExecution
         fields = [
@@ -70,7 +72,7 @@ class TaskExecutionDetailSerializer(serializers.ModelSerializer):
             "retry_count",
             "next_retry_at",
             "error_message",
-            "execution_time"
+            "execution_time",
         ]
         read_only_fields = fields
 
