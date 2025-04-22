@@ -14,7 +14,7 @@ import os
 
 from pathlib import Path
 from dotenv import load_dotenv
-
+from datetime import timedelta
 
 load_dotenv()
 
@@ -45,9 +45,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "rest_framework",
     "rest_framework_simplejwt",
+    "drf_spectacular",
     "users.apps.UsersConfig",
     "executions.apps.ExecutionsConfig",
     "workflows.apps.WorkflowsConfig",
+    "temporal.apps.TemporalConfig",
+    "notifications.apps.NotificationsConfig",
 ]
 
 MIDDLEWARE = [
@@ -115,12 +118,26 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTStatelessUserAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+
 AUTH_USER_MODEL = "users.User"
+
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}
+
+
+SPECTACULAR_SETTINGS = {
+    "TITLE": "Kairon API Documentation",
+    "DESCRIPTION": "API documentation for Kairon project",
+    "VERSION": "1.0.0",
+}
 
 
 # Internationalization
@@ -153,3 +170,12 @@ MAILERSEND_API_KEY = os.getenv("MAILERSEND_API_KEY")
 DEFAULT_FROM_EMAIL = os.getenv("MAILERSEND_DEFAULT_EMAIL")
 
 DEFAULT_FROM_NAME = "KaironAPP"
+
+
+# Temporal IO settings
+
+TEMPORAL_TASK_QUEUE_NAME = "Kairon-default-queue"
+
+TEMPORAL_CLIENT_ADDRESS = os.getenv("TEMPORAL_CLIENT_ADDRESS")
+
+TEMPORAL_CLIENT_NAMESPACE = os.getenv("TEMPORAL_CLIENT_NAMESPACE")
