@@ -37,6 +37,7 @@ class Task(models.Model):
     workflow = models.ForeignKey(
         Workflow, on_delete=models.CASCADE, related_name="tasks"
     )
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
     order = models.PositiveIntegerField()
@@ -44,8 +45,9 @@ class Task(models.Model):
         max_length=20,
         choices=[("email", "Email Sending"), ("report", "Report Generation")],
     )
-    retry_attempts = models.PositiveIntegerField(default=5)
-    retry_delay = models.PositiveIntegerField(default=15)
+    maximum_attempts = models.PositiveIntegerField(default=5)
+    initial_interval = models.PositiveIntegerField(default=15)
+    back_off = models.FloatField(default=2.0)
 
     def __str__(self):
         return self.name

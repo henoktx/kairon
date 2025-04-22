@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from .models import Workflow, Task, Schedule, EmailTask, ReportTask
+from .services.create_workflow import create_workflow
 
 
 class EmailTaskSerializer(serializers.ModelSerializer):
@@ -25,8 +27,9 @@ class TaskSerializer(serializers.ModelSerializer):
             "description",
             "order",
             "task_type",
-            "retry_attempts",
-            "retry_delay",
+            "maximum_attempts",
+            "initial_interval",
+            "back_off",
             "email_config",
             "report_config",
         ]
@@ -75,25 +78,4 @@ class WorkflowSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         tasks_data = validated_data.pop("tasks")
         schedule_data = validated_data.pop("schedules", None)
-
-        workflow = Workflow.objects.create(**validated_data)
-
-        for task_data in tasks_data:
-            email_config = task_data.pop("email_config", None)
-            report_config = task_data.pop("report_config", None)
-
-            task = Task.objects.create(workflow=workflow, **task_data)
-
-            if email_config:
-                EmailTask.objects.create(task=task, **email_config)
-            elif report_config:
-                ReportTask.objects.create(task=task, **report_config)
-
-        if schedule_data:
-            Schedule.objects.create(
-                workflow=workflow,
-                created_by=validated_data["created_by"],
-                **schedule_data,
-            )
-
-        return workflow
+        return create_workflow(validated_data, tasks_data, schedule_data)
