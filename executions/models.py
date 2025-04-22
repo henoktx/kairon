@@ -53,9 +53,6 @@ class TaskExecution(models.Model):
         default="running",
     )
 
-    retry_count = models.PositiveIntegerField(default=0)
-    next_retry_at = models.DateTimeField(null=True, blank=True)
-    temporal_activity_id = models.CharField(max_length=100, blank=True)
     error_message = models.TextField(blank=True)
 
     class Meta:

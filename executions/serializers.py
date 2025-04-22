@@ -15,9 +15,6 @@ class TaskExecutionSerializer(serializers.ModelSerializer):
             "started_at",
             "completed_at",
             "status",
-            "retry_count",
-            "next_retry_at",
-            "temporal_activity_id",
             "error_message",
             "execution_time",
         ]
@@ -69,8 +66,6 @@ class TaskExecutionDetailSerializer(serializers.ModelSerializer):
             "started_at",
             "completed_at",
             "status",
-            "retry_count",
-            "next_retry_at",
             "error_message",
             "execution_time",
         ]
