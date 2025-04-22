@@ -12,4 +12,6 @@ dependencies = [
     "psycopg2-binary>=2.9.10",
     "dotenv>=0.9.9",
     "black>=25.1.0",
+    "temporalio>=1.10.0",
+    "drf-spectacular>=0.28.0",
 ]
