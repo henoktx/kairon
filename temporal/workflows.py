@@ -1,15 +1,13 @@
 from datetime import timedelta
 from temporalio import workflow
 from temporalio.common import RetryPolicy
-from django.conf import settings
 
-from executions.types.execution import UpdateExecutionParams
-from executions.types.task_execution import UpdateTaskExecutionParams
-from .types.workflow import WorkflowInput, WorkflowResult
-from .types.task import TaskResult, TaskData, TaskType
-from .types.status import Status
+from .types.workflow import WorkflowInput
+from .types.task import TaskResult, TaskData
 
 with workflow.unsafe.imports_passed_through():
+    from executions.types.execution import UpdateExecutionParams
+    from executions.types.task_execution import UpdateTaskExecutionParams
     from .activities import (
         update_task_status_activity,
         update_execution_status_activity,
@@ -23,16 +21,17 @@ RETRY_DEFAULT_POLICY = RetryPolicy(
     maximum_attempts=5,
 )
 
+
 @workflow.defn
 class KaironWorkflow:
     @workflow.run
-    async def run(self, input_data: WorkflowInput) -> WorkflowResult:
+    async def run(self, input_data: WorkflowInput) -> None:
         try:
             task_results = []
             await workflow.execute_activity(
                 update_execution_status_activity,
                 UpdateExecutionParams(
-                    execution_id=input_data.execution_id, status=Status.RUNNING
+                    execution_id=input_data.execution_id, status="running"
                 ),
                 start_to_close_timeout=timedelta(seconds=10),
             )
@@ -41,25 +40,19 @@ class KaironWorkflow:
                 result = await self._execute_task(task)
                 task_results.append(result)
 
-                if result.status == Status.FAILED:
-                    raise Exception(f"Task {task.name} failed: {result.error_message}")
+                if result.status == "failed":
+                    raise RuntimeError(
+                        f"Task {task.name} failed: {result.error_message}"
+                    )
 
             await workflow.execute_activity(
                 update_execution_status_activity,
                 UpdateExecutionParams(
-                    execution_id=input_data.execution_id, status=Status.COMPLETED
+                    execution_id=input_data.execution_id, status="completed"
                 ),
                 start_to_close_timeout=timedelta(seconds=10),
-                task_queue=settings.TEMPORAL_TASK_QUEUE_NAME,
                 retry_policy=RETRY_DEFAULT_POLICY,
             )
-
-            return WorkflowResult(
-                execution_id=input_data.execution_id,
-                status=Status.COMPLETED,
-                task_results=task_results,
-            )
-
         except RuntimeError as e:
             error_message = str(e)
 
@@ -67,57 +60,49 @@ class KaironWorkflow:
                 update_execution_status_activity,
                 UpdateExecutionParams(
                     execution_id=input_data.execution_id,
-                    status=Status.FAILED,
+                    status="failed",
                     error_message=error_message,
                 ),
                 start_to_close_timeout=timedelta(seconds=10),
-                task_queue=settings.TEMPORAL_TASK_QUEUE_NAME,
                 retry_policy=RETRY_DEFAULT_POLICY,
-            )
-
-            return WorkflowResult(
-                execution_id=input_data.execution_id,
-                status=Status.FAILED,
-                task_results=task_results,
-                error_message=error_message,
             )
 
     async def _execute_task(self, task: TaskData) -> TaskResult:
         await workflow.execute_activity(
             update_task_status_activity,
             UpdateTaskExecutionParams(
-                task_execution_id=task.task_execution_id, status=Status.RUNNING
+                task_execution_id=task.task_execution_id, status="running"
             ),
             start_to_close_timeout=timedelta(seconds=10),
-            task_queue=settings.TEMPORAL_TASK_QUEUE_NAME,
             retry_policy=RETRY_DEFAULT_POLICY,
         )
 
         try:
-            result = None
-            if task.task_type == TaskType.EMAIL:
-                result = await workflow.execute_activity(
+            if task.task_type == "email":
+                await workflow.execute_activity(
                     send_email_activity,
                     task.email_config,
                     start_to_close_timeout=timedelta(seconds=10),
-                    retry_policy=task.retry_policy,
+                    retry_policy=RetryPolicy(
+                        initial_interval=timedelta(seconds=task.initial_interval),
+                        maximum_attempts=task.maximum_attempts,
+                        backoff_coefficient=task.backoff_coefficient
+                    ),
                 )
 
             await workflow.execute_activity(
                 update_task_status_activity,
                 UpdateTaskExecutionParams(
                     task_execution_id=task.task_execution_id,
-                    status=Status.COMPLETED,
+                    status="completed",
                 ),
                 start_to_close_timeout=timedelta(seconds=10),
-                task_queue=settings.TEMPORAL_TASK_QUEUE_NAME,
                 retry_policy=RETRY_DEFAULT_POLICY,
             )
 
             return TaskResult(
                 task_execution_id=task.task_execution_id,
-                status=Status.COMPLETED,
-                result=result,
+                status="completed"
             )
 
         except RuntimeError as e:
@@ -127,16 +112,15 @@ class KaironWorkflow:
                 update_task_status_activity,
                 UpdateTaskExecutionParams(
                     task_execution_id=task.task_execution_id,
-                    status=Status.FAILED,
+                    status="failed",
                     error_message=error_message,
                 ),
                 start_to_close_timeout=timedelta(seconds=10),
-                task_queue=settings.TEMPORAL_TASK_QUEUE_NAME,
                 retry_policy=RETRY_DEFAULT_POLICY,
             )
 
             return TaskResult(
                 task_execution_id=task.task_execution_id,
-                status=Status.FAILED,
+                status="failed",
                 error_message=error_message,
             )
