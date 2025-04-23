@@ -1,13 +1,16 @@
-from typing import override
-from rest_framework.serializers import ValidationError
-from rest_framework import generics, status
-from rest_framework.response import Response
+from rest_framework import viewsets, mixins
 
 from .models import Workflow
 from .serializers import WorkflowSerializer
 
 
-class WorkflowViewset(generics.ListCreateAPIView):
+class WorkflowViewset(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_class = WorkflowSerializer
 
     def get_queryset(self):

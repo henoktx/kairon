@@ -8,7 +8,10 @@ from .serializers import ExecutionSerializer
 
 
 class ExecutionViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    mixins.DestroyModelMixin,
+    viewsets.GenericViewSet,
 ):
     serializer_class = ExecutionSerializer
 
@@ -18,9 +21,9 @@ class ExecutionViewSet(
     @action(detail=True, methods=["post"])
     def execute(self, request, pk=None):
         try:
-            result = start_execution(execution_id=pk)
-            return Response(result, status=status.HTTP_201_CREATED)
+            start_execution(execution_id=pk)
+            return Response(status=status.HTTP_200_OK)
         except RuntimeError as e:
             return Response(
-                {"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

@@ -28,8 +28,10 @@ class TemporalWorker:
     async def start(self):
         if self._is_running:
             return
-        
-        self._client = await Client.connect(settings.TEMPORAL_CLIENT_ADDRESS, namespace=settings.TEMPORAL_CLIENT_NAMESPACE)
+        self._client = await Client.connect(
+            settings.TEMPORAL_CLIENT_ADDRESS,
+            namespace=settings.TEMPORAL_CLIENT_NAMESPACE,
+        )
         self._worker = Worker(
             self._client,
             task_queue=settings.TEMPORAL_TASK_QUEUE_NAME,

@@ -37,9 +37,7 @@ class MailerSendService(EmailService):
         }
 
         recipients = self._prepare_recipients(email_params.to_email)
-        cc_list = (
-            self._prepare_recipients(email_params.cc) if email_params.cc else None
-        )
+        cc_list = self._prepare_recipients(email_params.cc) if email_params.cc else None
 
         self.mailer.set_mail_from(mail_from, body)
         self.mailer.set_mail_to(recipients, body)
@@ -52,13 +50,12 @@ class MailerSendService(EmailService):
         self.mailer.set_plaintext_content(email_params.content, body)
 
         return body
-        
+
     def send_email(self, email_params: EmailParams) -> bool:
         try:
             body = self._prepare_email(email_params)
             response = self.mailer.send(body)
-            
-            return response.strip() == "202"
 
+            return response.strip() == "202"
         except RuntimeError as e:
             raise EmailServiceError(f"Falha ao enviar email: {str(e)}")

@@ -12,3 +12,6 @@ wheels/
 # Enviroments files
 *.env
 *.ini
+
+# IDE files
+.idea/

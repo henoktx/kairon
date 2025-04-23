@@ -24,7 +24,6 @@ class Execution(models.Model):
     )
 
     temporal_workflow_id = models.CharField(max_length=100, blank=True)
-    temporal_run_id = models.CharField(max_length=100, blank=True)
     error_message = models.TextField(blank=True)
 
     def __str__(self):

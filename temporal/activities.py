@@ -18,12 +18,9 @@ from notifications.types.email import EmailParams
 @activity.defn
 async def update_task_status_activity(
     task_execution_params: UpdateTaskExecutionParams,
-) -> Dict[str, Any]:
+) -> None:
     try:
-        result = await sync_to_async(update_task_execution_status)(
-            task_execution_params
-        )
-        return result
+        await sync_to_async(update_task_execution_status)(task_execution_params)
     except Exception as e:
         raise RuntimeError(f"Erro ao atualizar o status da task: {str(e)}")
 
@@ -47,12 +44,5 @@ async def send_email_activity(email_params: EmailParams) -> None:
 
         if not success:
             raise RuntimeError("Falha ao enviar e-mail")
-
-        # return {
-        #     "status": "sent",
-        #     "to_email": email_params.to_email,
-        #     "subject": email_params.subject,
-        #     "timestamp": datetime.now().isoformat(),
-        # }
     except EmailServiceError as e:
         raise RuntimeError(f"Erro no serviço de e-mail: {str(e)}")

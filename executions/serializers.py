@@ -1,10 +1,11 @@
 from rest_framework import serializers
+
 from .models import Execution, TaskExecution
-from workflows.serializers import WorkflowSerializer, TaskSerializer
+from workflows.serializers import WorkflowSimpleSerializer, TaskSimpleSerializer
 
 
 class TaskExecutionSerializer(serializers.ModelSerializer):
-    task = TaskSerializer(read_only=True)
+    task = TaskSimpleSerializer(read_only=True)
     execution_time = serializers.SerializerMethodField()
 
     class Meta:
@@ -25,7 +26,7 @@ class TaskExecutionSerializer(serializers.ModelSerializer):
 
 
 class ExecutionSerializer(serializers.ModelSerializer):
-    workflow = WorkflowSerializer(read_only=True)
+    workflow = WorkflowSimpleSerializer(read_only=True)
     task_executions = TaskExecutionSerializer(many=True, read_only=True)
     execution_time = serializers.SerializerMethodField()
 

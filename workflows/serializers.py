@@ -50,16 +50,32 @@ class TaskSerializer(serializers.ModelSerializer):
 
         return data
 
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+
+        if representation["email_config"] is None:
+            representation.pop("email_config")
+        if representation["report_config"] is None:
+            representation.pop("report_config")
+
+        return representation
+
 
 class ScheduleSpecSerializer(serializers.ModelSerializer):
     class Meta:
         model = Schedule
-        fields = ["minute", "hour", "day_of_month", "month", "day_of_week"]
+        fields = ["minute", "hour", "day_of_month", "day_of_week"]
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        return {
+            key: value for key, value in representation.items() if value is not None
+        }
 
 
 class WorkflowSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True)
-    spec = ScheduleSpecSerializer(source="schedules", required=False)
+    schedule = ScheduleSpecSerializer(required=False)
 
     class Meta:
         model = Workflow
@@ -69,13 +85,29 @@ class WorkflowSerializer(serializers.ModelSerializer):
             "description",
             "created_by",
             "created_at",
-            "delay_seconds",
+            "delay_minutes",
             "tasks",
-            "spec",
+            "schedule",
         ]
         read_only_fields = ["created_by", "created_at", "id"]
 
     def create(self, validated_data):
         tasks_data = validated_data.pop("tasks")
-        schedule_data = validated_data.pop("schedules", None)
+        schedule_data = validated_data.pop("schedule", None)
         return create_workflow(validated_data, tasks_data, schedule_data)
+
+
+class WorkflowSimpleSerializer(serializers.ModelSerializer):
+    schedule = ScheduleSpecSerializer()
+
+    class Meta:
+        model = Workflow
+        fields = ["id", "name", "created_at", "schedule"]
+        read_only_fields = fields
+
+
+class TaskSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ["id", "name", "task_type"]
+        read_only_fields = fields

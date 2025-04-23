@@ -12,7 +12,9 @@ def create_workflow(data, tasks_data, schedule_data=None) -> Workflow:
         email_config = task_data.pop("email_config", None)
         report_config = task_data.pop("report_config", None)
 
-        task = Task.objects.create(workflow=workflow, created_by = data["created_by"], **task_data)
+        task = Task.objects.create(
+            workflow=workflow, created_by=data["created_by"], **task_data
+        )
         task.execution = TaskExecution.objects.create(execution=execution, task=task)
 
         if email_config:

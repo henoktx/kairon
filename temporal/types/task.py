@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from enum import Enum
 from typing import Optional
 from temporalio.common import RetryPolicy
+from datetime import datetime
 
 from notifications.types.email import EmailParams
 
@@ -15,9 +16,11 @@ class TaskType(Enum):
 class TaskData:
     task_execution_id: int
     name: str
-    task_type: TaskType
+    task_type: str
     order: int
-    retry_policy: Optional[RetryPolicy] = None
+    initial_interval: int
+    maximum_attempts: int
+    backoff_coefficient: float
     email_config: Optional[EmailParams] = None
 
 
@@ -25,5 +28,4 @@ class TaskData:
 class TaskResult:
     task_execution_id: int
     status: str
-    result: Optional[dict] = None
     error_message: Optional[str] = None
