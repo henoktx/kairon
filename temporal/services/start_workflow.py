@@ -2,15 +2,16 @@ import uuid
 from datetime import timedelta
 
 from django.conf import settings
-from temporalio.client import Client, WorkflowFailureError
+from temporalio.client import WorkflowFailureError
 
 from temporal.workflows import KaironWorkflow
 from ..types.workflow import WorkflowInput
+from ..client import get_temporal_client
 
 
 async def start_workflow(data: WorkflowInput) -> str:
     workflow_id = f"workflow-{uuid.uuid4()}"
-    client = await Client.connect(settings.TEMPORAL_CLIENT_ADDRESS)
+    client = await get_temporal_client()
 
     try:
 

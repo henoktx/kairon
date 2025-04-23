@@ -1,15 +1,15 @@
 import uuid
 
-from django.conf import settings
 from temporalio.client import (
-    Client,
     ScheduleCalendarSpec,
     ScheduleSpec,
     ScheduleAlreadyRunningError,
     Schedule,
     ScheduleActionStartWorkflow,
 )
+from django.conf import settings
 
+from ..client import get_temporal_client
 from temporal.types.workflow import WorkflowInput
 from temporal.workflows import KaironWorkflow
 
@@ -19,7 +19,7 @@ async def start_schedule(
 ):
     schedule_id = f"schedule-{uuid.uuid4()}"
     workflow_id = f"workflow-{uuid.uuid4()}"
-    client = await Client.connect(settings.TEMPORAL_CLIENT_ADDRESS)
+    client = await get_temporal_client()
 
     try:
         await client.create_schedule(
@@ -29,7 +29,7 @@ async def start_schedule(
                     KaironWorkflow.run,
                     workflow_data,
                     id=workflow_id,
-                    task_queue="kairon-queue",
+                    task_queue=settings.TEMPORAL_TASK_QUEUE_NAME,
                 ),
                 spec=ScheduleSpec(calendars=[calendar_spec]),
             ),

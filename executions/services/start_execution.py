@@ -7,7 +7,7 @@ from temporal.services.start_workflow import start_workflow
 from ..models import Execution
 
 
-def start_execution(execution_id: int):
+def start_execution(execution_id: int) -> None:
     try:
         execution = Execution.objects.get(pk=execution_id)
         workflow_input = prepare_workflow_input(execution)
@@ -22,6 +22,5 @@ def start_execution(execution_id: int):
         execution.save()
 
     except Execution.DoesNotExist:
-        raise RuntimeError(f"Execuação com id {execution_id} não existe.")
-    except RuntimeError as e:
-        raise RuntimeError(f"A execução falhou com erro: {e}")
+        raise ValueError(f"Execuação com id {execution_id} não existe.")
+
