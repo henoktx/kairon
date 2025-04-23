@@ -11,7 +11,7 @@ def start_execution(execution_id: int):
     try:
         execution = Execution.objects.get(pk=execution_id)
         workflow_input = prepare_workflow_input(execution)
-        
+
         if hasattr(execution.workflow, "schedule"):
             schedule_input = prepare_schedule_input(execution)
             result = async_to_sync(start_schedule)(schedule_input, workflow_input)

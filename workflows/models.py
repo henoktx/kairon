@@ -10,7 +10,7 @@ class Workflow(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    delay_minutes= models.IntegerField(default=0)
+    delay_minutes = models.IntegerField(default=0)
 
     def __str__(self):
         return self.name
@@ -23,10 +23,18 @@ class Schedule(models.Model):
     created_by = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    minute = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(59)])
-    hour = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(23)])
-    day_of_month = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(31)])
-    day_of_week = models.IntegerField(null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(6)])
+    minute = models.IntegerField(
+        null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(59)]
+    )
+    hour = models.IntegerField(
+        null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(23)]
+    )
+    day_of_month = models.IntegerField(
+        null=True, blank=True, validators=[MinValueValidator(1), MaxValueValidator(31)]
+    )
+    day_of_week = models.IntegerField(
+        null=True, blank=True, validators=[MinValueValidator(0), MaxValueValidator(6)]
+    )
 
 
 class Task(models.Model):

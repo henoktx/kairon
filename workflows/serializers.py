@@ -99,6 +99,7 @@ class WorkflowSerializer(serializers.ModelSerializer):
 
 class WorkflowSimpleSerializer(serializers.ModelSerializer):
     schedule = ScheduleSpecSerializer()
+
     class Meta:
         model = Workflow
         fields = ["id", "name", "created_at", "schedule"]

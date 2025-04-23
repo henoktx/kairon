@@ -86,7 +86,7 @@ class KaironWorkflow:
                     retry_policy=RetryPolicy(
                         initial_interval=timedelta(seconds=task.initial_interval),
                         maximum_attempts=task.maximum_attempts,
-                        backoff_coefficient=task.backoff_coefficient
+                        backoff_coefficient=task.backoff_coefficient,
                     ),
                 )
 
@@ -101,8 +101,7 @@ class KaironWorkflow:
             )
 
             return TaskResult(
-                task_execution_id=task.task_execution_id,
-                status="completed"
+                task_execution_id=task.task_execution_id, status="completed"
             )
 
         except RuntimeError as e:

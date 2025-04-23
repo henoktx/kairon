@@ -25,6 +25,5 @@ class ExecutionViewSet(
             return Response(status=status.HTTP_200_OK)
         except RuntimeError as e:
             return Response(
-                {"detail": str(e)}, 
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

@@ -23,4 +23,3 @@ def update_task_execution_status(
             task_execution.error_message = task_execution_params.error_message
 
         task_execution.save()
-
