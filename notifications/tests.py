@@ -1,10 +1,11 @@
-from django.test import TestCase
 from unittest.mock import patch, MagicMock
-from django.conf import settings
 
-from .types.email import EmailParams
-from .services.mailersend import MailerSendService
+from django.conf import settings
+from django.test import TestCase
+
 from .exceptions import EmailServiceError
+from .services.mailersend import MailerSendService
+from .types.email import EmailParams
 
 
 class TestMailerSendService(TestCase):

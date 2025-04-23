@@ -1,7 +1,7 @@
 from django.db import models
 
-from workflows.models import Workflow, Task
 from users.models import User
+from workflows.models import Workflow, Task
 
 
 class Execution(models.Model):

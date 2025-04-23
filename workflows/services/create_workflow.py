@@ -1,5 +1,5 @@
-from ..models import Workflow, Task, Schedule, EmailTask, ReportTask
 from executions.models import TaskExecution, Execution
+from ..models import Workflow, Task, Schedule, EmailTask, ReportTask
 
 
 def create_workflow(data, tasks_data, schedule_data=None) -> Workflow:

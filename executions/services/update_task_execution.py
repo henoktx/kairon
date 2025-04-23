@@ -1,5 +1,5 @@
-from django.utils import timezone
 from django.db import transaction
+from django.utils import timezone
 
 from ..models import TaskExecution
 from ..types.task_execution import UpdateTaskExecutionParams

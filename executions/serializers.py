@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
-from .models import Execution, TaskExecution
 from workflows.serializers import WorkflowSimpleSerializer, TaskSimpleSerializer
+from .models import Execution, TaskExecution
 
 
 class TaskExecutionSerializer(serializers.ModelSerializer):

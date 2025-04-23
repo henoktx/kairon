@@ -1,4 +1,5 @@
 from typing import List, Dict, Any
+
 from django.conf import settings
 from mailersend import emails
 

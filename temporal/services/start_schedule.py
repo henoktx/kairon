@@ -1,14 +1,14 @@
 import uuid
+
+from django.conf import settings
 from temporalio.client import (
     Client,
     ScheduleCalendarSpec,
-    ScheduleRange,
     ScheduleSpec,
     ScheduleAlreadyRunningError,
     Schedule,
     ScheduleActionStartWorkflow,
 )
-from django.conf import settings
 
 from temporal.types.workflow import WorkflowInput
 from temporal.workflows import KaironWorkflow

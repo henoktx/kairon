@@ -1,17 +1,14 @@
-from typing import Dict, Any
 from asgiref.sync import sync_to_async
-
 from temporalio import activity
 
+from executions.services.update_execution import update_execution_status
 from executions.services.update_task_execution import (
     update_task_execution_status,
 )
-from executions.services.update_execution import update_execution_status
-from executions.types.task_execution import UpdateTaskExecutionParams
 from executions.types.execution import UpdateExecutionParams
-
-from notifications.services.mailersend import MailerSendService
+from executions.types.task_execution import UpdateTaskExecutionParams
 from notifications.exceptions import EmailServiceError
+from notifications.services.mailersend import MailerSendService
 from notifications.types.email import EmailParams
 
 

@@ -2,9 +2,9 @@ from rest_framework import viewsets, status, mixins
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from .services.start_execution import start_execution
 from .models import Execution
 from .serializers import ExecutionSerializer
+from .services.start_execution import start_execution
 
 
 class ExecutionViewSet(

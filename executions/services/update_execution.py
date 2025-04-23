@@ -1,5 +1,5 @@
-from django.utils import timezone
 from django.db import transaction
+from django.utils import timezone
 
 from ..models import Execution
 from ..types.execution import UpdateExecutionParams

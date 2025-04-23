@@ -1,13 +1,15 @@
 from typing import Optional
+
 from django.conf import settings
 from temporalio.client import Client
 from temporalio.worker import Worker
-from temporal.workflows import KaironWorkflow
+
 from temporal.activities import (
     update_task_status_activity,
     update_execution_status_activity,
     send_email_activity,
 )
+from temporal.workflows import KaironWorkflow
 
 
 class TemporalWorker:

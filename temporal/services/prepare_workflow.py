@@ -1,8 +1,8 @@
 from executions.models import Execution, TaskExecution
-from workflows.models import EmailTask
-from ..types.workflow import WorkflowInput
-from ..types.task import TaskData, TaskType
 from notifications.types.email import EmailParams
+from workflows.models import EmailTask
+from ..types.task import TaskData, TaskType
+from ..types.workflow import WorkflowInput
 
 
 def prepare_workflow_input(execution: Execution) -> WorkflowInput:
