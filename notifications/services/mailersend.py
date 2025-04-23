@@ -61,7 +61,7 @@ class MailerSendService(EmailService):
         response_code = int(response[0:3])
 
         if response_code != 202:
-            reponse_mensage = response[3:-1]
-            raise EmailServiceError(f"code: {response_code}, detail: {reponse_mensage}")
+            response_message = response[3:-1]
+            raise EmailServiceError(f"code: {response_code}, detail: {response_message}")
 
         return EmailResponse(code=response_code)
