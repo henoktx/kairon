@@ -1,18 +1,17 @@
-from rest_framework import viewsets, mixins, permissions, generics
+from rest_framework import viewsets, permissions
 
 from .models import User
 from .serializers import UserSerializer
 
 
-class CreateUserView(generics.CreateAPIView):
-    queryset = User.objects.all()
-    permission_classes = [permissions.AllowAny]
-    serializer_class = UserSerializer
-
-
-class UpdateDestroyRetrieveUserViewSet(mixins.UpdateModelMixin, 
-                              mixins.DestroyModelMixin,
-                              mixins.RetrieveModelMixin, 
-                              viewsets.GenericViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def get_permissions(self):
+        if self.action == "create":
+            permission_classes = [permissions.AllowAny]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+
+        return [permission() for permission in permission_classes]
