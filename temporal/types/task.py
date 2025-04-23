@@ -3,6 +3,7 @@ from enum import Enum
 from typing import Optional
 
 from notifications.types.email import EmailParams
+from reports.types.report import ReportParams
 
 
 class TaskType(Enum):
@@ -20,6 +21,7 @@ class TaskData:
     maximum_attempts: int
     backoff_coefficient: float
     email_config: Optional[EmailParams] = None
+    report_config: Optional[ReportParams] = None
 
 
 @dataclass

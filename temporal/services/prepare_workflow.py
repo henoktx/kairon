@@ -1,6 +1,7 @@
 from executions.models import Execution, TaskExecution
 from notifications.types.email import EmailParams
-from workflows.models import EmailTask
+from reports.types.report import ReportParams
+from workflows.models import EmailTask, ReportTask
 from ..types.task import TaskData, TaskType
 from ..types.workflow import WorkflowInput
 
@@ -33,6 +34,13 @@ def prepare_workflow_input(execution: Execution) -> WorkflowInput:
                 from_name=email_task.task.created_by.first_name,
             )
             task_data.email_config = email_config
+        elif task.task_type == TaskType.REPORT.value:
+            report_task = ReportTask.objects.get(task_id=task.id)
+            report_config = ReportParams(
+                user_id=report_task.task.created_by.id,
+                filter_type=report_task.filter_type,
+            )
+            task_data.report_config = report_config
 
         tasks_data.append(task_data)
 
