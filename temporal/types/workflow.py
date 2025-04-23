@@ -9,7 +9,7 @@ class WorkflowInput:
     execution_id: int
     workflow_name: str
     tasks: List[TaskData]
-    delay_seconds: int = 0
+    delay_minutes: int = 0
 
 
 @dataclass
