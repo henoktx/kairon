@@ -19,10 +19,3 @@ def update_execution_status(execution_params: UpdateExecutionParams) -> None:
             execution.error_message = execution_params.error_message
 
         execution.save()
-
-        # return {
-        #     "id": execution.id,
-        #     "status": execution.status,
-        #     "started_at": execution.started_at,
-        #     "completed_at": execution.completed_at,
-        # }
