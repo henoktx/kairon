@@ -5,7 +5,7 @@ from mailersend import emails
 
 from .base import EmailService
 from ..exceptions import EmailServiceError
-from ..types.email import EmailParams
+from ..types.email import EmailParams, EmailResponse
 
 
 class MailerSendService(EmailService):
@@ -50,13 +50,18 @@ class MailerSendService(EmailService):
         self.mailer.set_subject(email_params.subject, body)
         self.mailer.set_plaintext_content(email_params.content, body)
 
+        if email_params.html_content:
+            self.mailer.set_html_content(email_params.html_content, body)
+
         return body
 
-    def send_email(self, email_params: EmailParams) -> bool:
-        try:
-            body = self._prepare_email(email_params)
-            response = self.mailer.send(body)
+    def send_email(self, email_params: EmailParams) -> EmailResponse:
+        body = self._prepare_email(email_params)
+        response = self.mailer.send(body)
+        response_code = int(response[0:3])
 
-            return response.strip() == "202"
-        except RuntimeError as e:
-            raise EmailServiceError(f"Falha ao enviar email: {str(e)}")
+        if response_code != 202:
+            response_message = response[3:-1]
+            raise EmailServiceError(f"code: {response_code}, detail: {response_message}")
+
+        return EmailResponse(code=response_code)

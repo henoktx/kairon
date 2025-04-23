@@ -5,8 +5,8 @@ from django.conf import settings
 from temporalio.client import WorkflowFailureError
 
 from temporal.workflows import KaironWorkflow
-from ..types.workflow import WorkflowInput
 from ..client import get_temporal_client
+from ..types.workflow import WorkflowInput
 
 
 async def start_workflow(data: WorkflowInput) -> str:

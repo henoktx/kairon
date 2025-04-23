@@ -4,9 +4,8 @@ from rest_framework.response import Response
 
 from .models import Execution
 from .serializers import ExecutionSerializer
-from .services.start_execution import start_execution
 from .services.reset_execution import reset_execution
-
+from .services.start_execution import start_execution
 
 
 class ExecutionViewSet(

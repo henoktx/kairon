@@ -1,7 +1,7 @@
 from django.conf import settings
-from temporalio.api.workflowservice.v1 import ResetWorkflowExecutionRequest
 from temporalio.api.common.v1 import WorkflowExecution
 from temporalio.api.enums.v1 import EventType
+from temporalio.api.workflowservice.v1 import ResetWorkflowExecutionRequest
 
 from ..client import get_temporal_client
 
@@ -21,5 +21,6 @@ async def reset_workflow(workflow_id: str):
             namespace=settings.TEMPORAL_CLIENT_NAMESPACE,
             request_id="reset-failed-workflow",
             workflow_execution=WorkflowExecution(workflow_id=workflow_id),
-            workflow_task_finish_event_id=event_id)
+            workflow_task_finish_event_id=event_id,
         )
+    )

@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from temporalio.client import (
     ScheduleCalendarSpec,
     ScheduleSpec,
@@ -7,11 +8,10 @@ from temporalio.client import (
     Schedule,
     ScheduleActionStartWorkflow,
 )
-from django.conf import settings
 
-from ..client import get_temporal_client
 from temporal.types.workflow import WorkflowInput
 from temporal.workflows import KaironWorkflow
+from ..client import get_temporal_client
 
 
 async def start_schedule(

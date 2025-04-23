@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "workflows.apps.WorkflowsConfig",
     "temporal.apps.TemporalConfig",
     "notifications.apps.NotificationsConfig",
+    "reports.apps.ReportsConfig",
 ]
 
 MIDDLEWARE = [

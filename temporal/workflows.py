@@ -13,6 +13,7 @@ with workflow.unsafe.imports_passed_through():
         update_task_status_activity,
         update_execution_status_activity,
         send_email_activity,
+        generate_report_activity,
     )
 
 
@@ -78,17 +79,34 @@ class KaironWorkflow:
             retry_policy=RETRY_DEFAULT_POLICY,
         )
 
+        TASK_RETRY_POLICY = RetryPolicy(
+            initial_interval=timedelta(seconds=task.initial_interval),
+            maximum_attempts=task.maximum_attempts,
+            backoff_coefficient=task.backoff_coefficient,
+        )
+
         try:
             if task.task_type == "email":
                 await workflow.execute_activity(
                     send_email_activity,
                     task.email_config,
                     start_to_close_timeout=timedelta(seconds=10),
-                    retry_policy=RetryPolicy(
-                        initial_interval=timedelta(seconds=task.initial_interval),
-                        maximum_attempts=task.maximum_attempts,
-                        backoff_coefficient=task.backoff_coefficient,
-                    ),
+                    retry_policy=TASK_RETRY_POLICY,
+                )
+
+            elif task.task_type == "report":
+                report = await workflow.execute_activity(
+                    generate_report_activity,
+                    task.report_config,
+                    start_to_close_timeout=timedelta(seconds=30),
+                    retry_policy=TASK_RETRY_POLICY,
+                )
+
+                await workflow.execute_activity(
+                    send_email_activity,
+                    report,
+                    start_to_close_timeout=timedelta(seconds=10),
+                    retry_policy=TASK_RETRY_POLICY,
                 )
 
             await workflow.execute_activity(
