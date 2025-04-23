@@ -2,8 +2,10 @@
 
 #### Arquitetura Proposta
 
+![Diagrama de arquitetura](diagrama-arquitetura.jpg)
+
 O sistema é composto por dois grandes blocos: **KaironAPP** (aplicação Django) e **Serviços Externos** (incluindo o Temporal.io).  
-A arquitetura é orientada a microsserviços, com integração entre Django, Temporal.io e serviços auxiliares como envio de e-mails.
+A arquitetura tem integração entre Django, Temporal.io e serviços auxiliares como envio de e-mails.
 
 - **KaironAPP (Django):**
   - **NotificationsAPP:** Responsável pelo envio de notificações (ex: e-mails).
@@ -116,6 +118,8 @@ python manage.py runserver
 #### Explicação Detalhada da Modelagem
 
 A modelagem do sistema foi pensada para garantir rastreabilidade, reprocessamento e escalabilidade das execuções, aproveitando o Temporal.io para orquestração e resiliência.
+
+![Diagrama de Relacionamento-Entidade](diagrama-ER.png)
 
 **Principais modelos:**
 
