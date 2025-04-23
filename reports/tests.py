@@ -150,7 +150,7 @@ class EmailReportGeneratorTests(TestCase):
             started_at=self.now - timedelta(minutes=15),
             completed_at=self.now - timedelta(minutes=14),
         )
-        
+
         TaskExecution.objects.create(
             task=self.task3,
             execution=self.execution3,
@@ -161,9 +161,7 @@ class EmailReportGeneratorTests(TestCase):
 
     def test_email_report_basic_generation(self):
         generator = EmailReportGenerator()
-        params = ReportParams(
-            user_id=self.user1.id, filter_type="last_hour"
-        )
+        params = ReportParams(user_id=self.user1.id, filter_type="last_hour")
 
         report = generator.generate_report(params)
 
@@ -171,15 +169,17 @@ class EmailReportGeneratorTests(TestCase):
         self.assertTrue(report.period_start < report.period_end)
 
         stats = report.stats
-        self.assertEqual(stats.total_sent, 5) 
+        self.assertEqual(stats.total_sent, 5)
         self.assertEqual(stats.successful_deliveries, 3)
         self.assertEqual(stats.failed_deliveries, 2)
-        self.assertEqual(stats.total_recipients, 15)  
-        self.assertEqual(stats.unique_recipients, 3)  
+        self.assertEqual(stats.total_recipients, 15)
+        self.assertEqual(stats.unique_recipients, 3)
         self.assertEqual(stats.average_delivery_time, 60.0)
 
         self.assertEqual(len(report.most_common_recipients), 3)
-        recipient_counts = {r["email"]: r["count"] for r in report.most_common_recipients}
+        recipient_counts = {
+            r["email"]: r["count"] for r in report.most_common_recipients
+        }
         self.assertEqual(recipient_counts["john@example.com"], 5)
         self.assertEqual(recipient_counts["jane@example.com"], 5)
         self.assertEqual(recipient_counts["manager@example.com"], 5)
@@ -190,32 +190,35 @@ class EmailReportGeneratorTests(TestCase):
         filter_types = ["last_hour", "last_day", "last_week", "last_month"]
         expected_totals = {
             "last_hour": 5,
-            "last_day": 7, 
-            "last_week": 10,  
-            "last_month": 12,  
+            "last_day": 7,
+            "last_week": 10,
+            "last_month": 12,
         }
 
         for filter_type in filter_types:
             with self.subTest(filter_type=filter_type):
                 params = ReportParams(user_id=self.user1.id, filter_type=filter_type)
                 report = generator.generate_report(params)
-                self.assertEqual(report.stats.total_sent, expected_totals[filter_type], 
-                                f"Expected {expected_totals[filter_type]} for {filter_type}")
-                
                 self.assertEqual(
-                    report.stats.total_recipients, 
+                    report.stats.total_sent,
+                    expected_totals[filter_type],
+                    f"Expected {expected_totals[filter_type]} for {filter_type}",
+                )
+
+                self.assertEqual(
+                    report.stats.total_recipients,
                     expected_totals[filter_type] * 3,
-                    f"Expected {expected_totals[filter_type] * 3} recipients for {filter_type}"
+                    f"Expected {expected_totals[filter_type] * 3} recipients for {filter_type}",
                 )
 
     def test_report_with_no_data(self):
         new_user = User.objects.create(username="newuser", email="new@example.com")
-        
+
         generator = EmailReportGenerator()
         params = ReportParams(user_id=new_user.id, filter_type="last_hour")
-        
+
         report = generator.generate_report(params)
-        
+
         self.assertEqual(report.stats.total_sent, 0)
         self.assertEqual(report.stats.successful_deliveries, 0)
         self.assertEqual(report.stats.failed_deliveries, 0)
@@ -226,24 +229,29 @@ class EmailReportGeneratorTests(TestCase):
     def test_report_with_multiple_recipients(self):
         generator = EmailReportGenerator()
         params = ReportParams(user_id=self.user3.id, filter_type="last_day")
-        
+
         report = generator.generate_report(params)
-        
-        self.assertEqual(report.stats.total_sent, 1) 
-        self.assertEqual(report.stats.total_recipients, 5) 
+
+        self.assertEqual(report.stats.total_sent, 1)
+        self.assertEqual(report.stats.total_recipients, 5)
         self.assertEqual(report.stats.unique_recipients, 5)
-        
-        recipient_counts = {r["email"]: r["count"] for r in report.most_common_recipients}
+
+        recipient_counts = {
+            r["email"]: r["count"] for r in report.most_common_recipients
+        }
         self.assertEqual(len(recipient_counts), 5)
-        for email in ["john@example.com", "sarah@example.com", "mike@example.com", 
-                     "director@example.com", "manager@example.com"]:
+        for email in [
+            "john@example.com",
+            "sarah@example.com",
+            "mike@example.com",
+            "director@example.com",
+            "manager@example.com",
+        ]:
             self.assertEqual(recipient_counts[email], 1)
 
     def test_invalid_user(self):
         generator = EmailReportGenerator()
-        params = ReportParams(
-            user_id=9999, filter_type="last_hour"
-        )
+        params = ReportParams(user_id=9999, filter_type="last_hour")
 
         with self.assertRaises(ValueError):
             generator.generate_report(params)
@@ -257,12 +265,10 @@ class EmailReportGeneratorTests(TestCase):
 
     def test_execution_status_distribution(self):
         generator = EmailReportGenerator()
-        
+
         params = ReportParams(user_id=self.user1.id, filter_type="last_month")
         report = generator.generate_report(params)
-        
+
         self.assertEqual(report.stats.successful_deliveries, 8)
         self.assertEqual(report.stats.failed_deliveries, 4)
         self.assertEqual(report.stats.total_sent, 12)
-        
-       

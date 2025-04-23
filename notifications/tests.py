@@ -172,7 +172,7 @@ class TestMailerSendService(TestCase):
                     content=self.test_content,
                 )
             )
-        
+
         self.assertIn("code: 400", str(context.exception))
 
     def test_service_initialization(self):

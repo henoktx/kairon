@@ -7,11 +7,10 @@ from executions.services.update_task_execution import (
 )
 from executions.types.execution import UpdateExecutionParams
 from executions.types.task_execution import UpdateTaskExecutionParams
-from notifications.exceptions import EmailServiceError
 from notifications.services.mailersend import MailerSendService
 from notifications.types.email import EmailParams
-from reports.services.report_generator import EmailReportGenerator
 from reports.services.formart_report import format_report_as_html
+from reports.services.report_generator import EmailReportGenerator
 from reports.types.report import ReportParams
 
 
@@ -55,11 +54,11 @@ async def generate_report_activity(report_params: ReportParams) -> EmailParams:
     try:
         report = await sync_to_async(report_generator.generate_report)(report_params)
         email_params = EmailParams(
-                    subject=f"Envio de relatório de emails",
-                    to_email=[report.user_email],
-                    content="",
-                    html_content=format_report_as_html(report)
-                )
+            subject=f"Envio de relatório de emails",
+            to_email=[report.user_email],
+            content="",
+            html_content=format_report_as_html(report),
+        )
         return email_params
     except Exception as e:
         raise exceptions.ApplicationError(f"Erro na geração do relatório: {str(e)}")

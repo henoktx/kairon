@@ -23,4 +23,3 @@ def start_execution(execution_id: int) -> None:
 
     except Execution.DoesNotExist:
         raise ValueError(f"Execuação com id {execution_id} não existe.")
-

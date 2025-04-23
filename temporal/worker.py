@@ -43,7 +43,7 @@ class TemporalWorker:
                 update_task_status_activity,
                 update_execution_status_activity,
                 send_email_activity,
-                generate_report_activity
+                generate_report_activity,
             ],
         )
         self._is_running = True

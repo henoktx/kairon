@@ -1,11 +1,12 @@
 from typing import Optional
+
 from django.conf import settings
 from temporalio.client import Client
 
 
 class TemporalClientSingleton:
     _instance: Optional[Client] = None
-    
+
     @classmethod
     async def get_client(cls) -> Client:
         if cls._instance is None:

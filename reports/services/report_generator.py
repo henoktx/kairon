@@ -46,7 +46,9 @@ class EmailReportGenerator:
             unique_recipients.update(cc_list)
 
         avg_delivery_time = (
-            sum(e.execution_time() for e in executions if e.execution_time() is not None)
+            sum(
+                e.execution_time() for e in executions if e.execution_time() is not None
+            )
             / len([e for e in executions if e.execution_time() is not None])
             if executions
             else 0.0

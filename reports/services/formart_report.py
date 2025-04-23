@@ -1,5 +1,6 @@
 from ..types.report import EmailDeliveryReport
 
+
 def format_report_as_html(report: EmailDeliveryReport) -> str:
     html = f"""
     <html>
@@ -39,7 +40,7 @@ def format_report_as_html(report: EmailDeliveryReport) -> str:
                         <th>Quantidade</th>
                     </tr>
     """
-    
+
     for recipient in report.most_common_recipients:
         html += f"""
                     <tr>
@@ -47,7 +48,7 @@ def format_report_as_html(report: EmailDeliveryReport) -> str:
                         <td>{recipient['count']}</td>
                     </tr>
         """
-    
+
     html += """
                 </table>
             </div>
@@ -55,5 +56,5 @@ def format_report_as_html(report: EmailDeliveryReport) -> str:
     </body>
     </html>
     """
-        
+
     return html
