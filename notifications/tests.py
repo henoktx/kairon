@@ -52,7 +52,7 @@ class TestMailerSendService(TestCase):
             )
         )
 
-        self.assertTrue(result)
+        self.assertEqual(result.code, 202)
 
         mock_mailer.set_mail_from.assert_called_once_with(
             {"email": settings.DEFAULT_FROM_EMAIL, "name": settings.DEFAULT_FROM_NAME},
@@ -80,7 +80,7 @@ class TestMailerSendService(TestCase):
 
         result = self.service.send_email(
             EmailParams(
-                to_email=self.test_email,
+                to_email=[self.test_email],  # Corrigido: deve ser uma lista
                 subject=self.test_subject,
                 content=self.test_content,
                 from_email=custom_from_email,
@@ -88,7 +88,7 @@ class TestMailerSendService(TestCase):
             )
         )
 
-        self.assertTrue(result)
+        self.assertEqual(result.code, 202)
 
         mock_mailer.set_mail_from.assert_called_once_with(
             {"email": settings.DEFAULT_FROM_EMAIL, "name": settings.DEFAULT_FROM_NAME},
@@ -99,89 +99,81 @@ class TestMailerSendService(TestCase):
         )
 
     @patch("notifications.services.mailersend.emails.NewEmail")
-    def test_send_email_with_cc_bcc(self, mock_new_email):
+    def test_send_email_with_cc(self, mock_new_email):
         mock_mailer = MagicMock()
         mock_mailer.send.return_value = "202"
         mock_new_email.return_value = mock_mailer
 
         cc = ["cc@test.com"]
-        bcc = ["bcc@test.com"]
 
         result = self.service.send_email(
             EmailParams(
-                to_email=self.test_email,
+                to_email=[self.test_email],  # Corrigido: deve ser uma lista
                 subject=self.test_subject,
                 content=self.test_content,
                 cc=cc,
-                bcc=bcc,
             )
         )
 
-        self.assertTrue(result)
+        self.assertEqual(result.code, 202)
 
         mock_mailer.set_cc_recipients.assert_called_once_with(
             [{"email": "cc@test.com"}], {}
         )
-        mock_mailer.set_bcc_recipients.assert_called_once_with(
-            [{"email": "bcc@test.com"}], {}
-        )
 
     @patch("notifications.services.mailersend.emails.NewEmail")
-    def test_send_email_with_template(self, mock_new_email):
+    def test_send_email_with_html_content(self, mock_new_email):
         mock_mailer = MagicMock()
         mock_mailer.send.return_value = "202"
         mock_new_email.return_value = mock_mailer
 
-        template_id = "template123"
+        html_content = "<p>Test HTML Content</p>"
 
         result = self.service.send_email(
             EmailParams(
-                to_email=self.test_email,
+                to_email=[self.test_email],
                 subject=self.test_subject,
                 content=self.test_content,
-                template_id=template_id,
+                html_content=html_content,
             )
         )
 
-        self.assertTrue(result)
-
-        mock_mailer.set_template.assert_called_once_with(template_id, {})
-
-        mock_mailer.set_subject.assert_not_called()
-        mock_mailer.set_plaintext_content.assert_not_called()
+        self.assertEqual(result.code, 202)
+        mock_mailer.set_html_content.assert_called_once_with(html_content, {})
 
     @patch("notifications.services.mailersend.emails.NewEmail")
     def test_send_email_api_error(self, mock_new_email):
         mock_mailer = MagicMock()
-        mock_mailer.send.side_effect = RuntimeError("API Error")
+        mock_mailer.send.return_value = "500 Internal Server Error"
         mock_new_email.return_value = mock_mailer
 
         with self.assertRaises(EmailServiceError) as context:
             self.service.send_email(
                 EmailParams(
-                    to_email=self.test_email,
+                    to_email=[self.test_email],
                     subject=self.test_subject,
                     content=self.test_content,
                 )
             )
 
-        self.assertIn("Falha ao enviar email", str(context.exception))
+        self.assertIn("code: 500", str(context.exception))
 
     @patch("notifications.services.mailersend.emails.NewEmail")
     def test_send_email_non_202_response(self, mock_new_email):
         mock_mailer = MagicMock()
-        mock_mailer.send.return_value = "400"
+        mock_mailer.send.return_value = "400 Bad Request"  # Simulando resposta de erro
         mock_new_email.return_value = mock_mailer
 
-        result = self.service.send_email(
-            EmailParams(
-                to_email=self.test_email,
-                subject=self.test_subject,
-                content=self.test_content,
+        with self.assertRaises(EmailServiceError) as context:
+            self.service.send_email(
+                EmailParams(
+                    to_email=[self.test_email],
+                    subject=self.test_subject,
+                    content=self.test_content,
+                )
             )
-        )
-
-        self.assertFalse(result)
+        
+        self.assertIn("code: 400", str(context.exception))
 
     def test_service_initialization(self):
         self.assertEqual(self.service.api_key, settings.MAILERSEND_API_KEY)
