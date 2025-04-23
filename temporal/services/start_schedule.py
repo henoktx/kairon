@@ -9,9 +9,9 @@ from temporalio.client import (
     ScheduleActionStartWorkflow,
 )
 
-from temporal.types.workflow import WorkflowInput
-from temporal.workflows import KaironWorkflow
 from ..client import get_temporal_client
+from ..types.workflow import WorkflowInput
+from ..workflows import KaironWorkflow
 
 
 async def start_schedule(
