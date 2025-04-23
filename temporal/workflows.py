@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from temporalio import workflow
+from temporalio import workflow, exceptions
 from temporalio.common import RetryPolicy
 
 from .types.task import TaskResult, TaskData
@@ -42,7 +42,7 @@ class KaironWorkflow:
                 task_results.append(result)
 
                 if result.status == "failed":
-                    raise RuntimeError(
+                    raise exceptions.ApplicationError(
                         f"Task {task.name} failed: {result.error_message}"
                     )
 
@@ -54,7 +54,7 @@ class KaironWorkflow:
                 start_to_close_timeout=timedelta(seconds=10),
                 retry_policy=RETRY_DEFAULT_POLICY,
             )
-        except RuntimeError as e:
+        except exceptions.TemporalError as e:
             error_message = str(e)
 
             await workflow.execute_activity(
@@ -105,7 +105,7 @@ class KaironWorkflow:
                 task_execution_id=task.task_execution_id, status="completed"
             )
 
-        except RuntimeError as e:
+        except exceptions.TemporalError as e:
             error_message = str(e)
 
             await workflow.execute_activity(

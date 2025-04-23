@@ -1,5 +1,5 @@
 from asgiref.sync import sync_to_async
-from temporalio import activity
+from temporalio import activity, exceptions
 
 from executions.services.update_execution import update_execution_status
 from executions.services.update_task_execution import (
@@ -19,7 +19,7 @@ async def update_task_status_activity(
     try:
         await sync_to_async(update_task_execution_status)(task_execution_params)
     except Exception as e:
-        raise RuntimeError(f"Erro ao atualizar o status da task: {str(e)}")
+        raise exceptions.ApplicationError(f"Erro ao atualizar o status da task: {str(e)}")
 
 
 @activity.defn
@@ -29,7 +29,7 @@ async def update_execution_status_activity(
     try:
         await sync_to_async(update_execution_status)(execution_params)
     except Exception as e:
-        raise RuntimeError(f"Erro ao atualizar o status do workflow: {str(e)}")
+        raise exceptions.ApplicationError(f"Erro ao atualizar o status do workflow: {str(e)}")
 
 
 @activity.defn
@@ -40,6 +40,6 @@ async def send_email_activity(email_params: EmailParams) -> None:
         success = await sync_to_async(email_service.send_email)(email_params)
 
         if not success:
-            raise RuntimeError("Falha ao enviar e-mail")
+            raise EmailServiceError("Falha ao enviar e-mail")
     except EmailServiceError as e:
-        raise RuntimeError(f"Erro no serviço de e-mail: {str(e)}")
+        raise exceptions.ApplicationError(f"Erro no serviço de e-mail: {str(e)}")
