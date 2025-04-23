@@ -5,6 +5,8 @@ from rest_framework.response import Response
 from .models import Execution
 from .serializers import ExecutionSerializer
 from .services.start_execution import start_execution
+from .services.reset_execution import reset_execution
+
 
 
 class ExecutionViewSet(
@@ -23,6 +25,20 @@ class ExecutionViewSet(
         try:
             start_execution(execution_id=pk)
             return Response(status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        except RuntimeError as e:
+            return Response(
+                {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+    @action(detail=True, methods=["post"])
+    def reset(self, request, pk=None):
+        try:
+            reset_execution(execution_id=pk)
+            return Response(status=status.HTTP_200_OK)
+        except ValueError as e:
+            return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
         except RuntimeError as e:
             return Response(
                 {"detail": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR
