@@ -19,7 +19,6 @@ def update_task_execution_status(
         elif task_execution.status in ["completed", "failed"]:
             task_execution.completed_at = timezone.now()
 
-        if task_execution_params.error_message:
-            task_execution.error_message = task_execution_params.error_message
+        task_execution.error_message = task_execution_params.error_message or ""
 
         task_execution.save()

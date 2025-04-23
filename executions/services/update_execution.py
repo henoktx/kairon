@@ -12,10 +12,11 @@ def update_execution_status(execution_params: UpdateExecutionParams) -> None:
         )
         execution.status = execution_params.status
 
+        if execution.status == "running":
+            execution.started_at = timezone.now()
         if execution.status in ["completed", "failed", "canceled", "terminated"]:
             execution.completed_at = timezone.now()
 
-        if execution_params.error_message:
-            execution.error_message = execution_params.error_message
+        execution.error_message = execution_params.error_message or ""
 
         execution.save()
